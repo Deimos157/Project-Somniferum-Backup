@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terra Vetus — Interactive Map</title>
+    <style>
+        body { margin: 0; padding: 0; background: #222; color: #fff; font-family: sans-serif; overflow: hidden; }
+        #map-container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        canvas { border: 2px solid #cca43b; max-width: 100%; max-height: 100%; }
+        #ui-overlay { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 5px; border: 1px solid #cca43b; pointer-events: none; }
+        h1 { margin: 0 0 5px 0; font-size: 1.2rem; color: #cca43b; }
+    </style>
+</head>
+<body>
+
+    <div id="ui-overlay">
+        <h1>Terra Vetus Atlas</h1>
+        <p id="status">Loading geographic data layers...</p>
+    </div>
+
+    <div id="map-container">
+        <!-- The canvas element where our shapes will render over the map image -->
+        <canvas id="mapCanvas"></canvas>
+    </div>
+
+    <!-- 1. Load your asset files (Make sure filenames match exactly) -->
+    <script src="realm-shapes.js"></script>
+    <script src="imported-places.js"></script>
+    
+    <!-- 2. Main renderer script to overlay data points onto the image texture -->
+    <script>
+        const canvas = document.getElementById('mapCanvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        // Replace this with your uploaded map image filename
+        img.src = 'image_cXLBoM.png'; 
+
+        img.onload = function() {
+            // Set canvas size to match the uploaded map layout dimensions
+            canvas.width = img.width;
+            canvas.height = img.height;
+            
+            // Draw background world texture map
+            ctx.drawImage(img, 0, 0);
+            
+            // Render interactive place markers from your data arrays
+            if (window.atlasImportedPlaces) {
+                document.getElementById('status').innerText = `Successfully loaded ${window.atlasImportedPlaces.length} realms.`;
+                
+                window.atlasImportedPlaces.forEach(place => {
+                    ctx.beginPath();
+                    // Draw a visual marker point at the registered coordinates
+                    ctx.arc(place.x, place.y, 12, 0, 2 * Math.PI);
+                    ctx.fillStyle = place.layer === 'seas' ? '#3a7bd5' : '#d9a7c7';
+                    ctx.fill();
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = '#fff';
+                    ctx.stroke();
+                });
+            }
+        };
+    </script>
+</body>
+</html>
